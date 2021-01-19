@@ -15,6 +15,9 @@
 		CE910C0125B6EBA900FF40DB /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = CE910C0025B6EBA900FF40DB /* Assets.xcassets */; };
 		CE910C0425B6EBA900FF40DB /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = CE910C0225B6EBA900FF40DB /* LaunchScreen.storyboard */; };
 		CE910C0725B6EBA900FF40DB /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = CE910C0625B6EBA900FF40DB /* main.m */; };
+		CEB6D20425B6F1AC00486081 /* Weather+CoreDataClass.m in Sources */ = {isa = PBXBuildFile; fileRef = CEB6D20225B6F1AC00486081 /* Weather+CoreDataClass.m */; };
+		CEB6D20525B6F1AC00486081 /* Weather+CoreDataProperties.m in Sources */ = {isa = PBXBuildFile; fileRef = CEB6D20325B6F1AC00486081 /* Weather+CoreDataProperties.m */; };
+		CEB6D20B25B6F2A100486081 /* MainViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = CEB6D20A25B6F2A100486081 /* MainViewController.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -31,6 +34,12 @@
 		CE910C0325B6EBA900FF40DB /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		CE910C0525B6EBA900FF40DB /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		CE910C0625B6EBA900FF40DB /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		CEB6D20025B6F1AC00486081 /* Weather+CoreDataProperties.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Weather+CoreDataProperties.h"; sourceTree = "<group>"; };
+		CEB6D20125B6F1AC00486081 /* Weather+CoreDataClass.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Weather+CoreDataClass.h"; sourceTree = "<group>"; };
+		CEB6D20225B6F1AC00486081 /* Weather+CoreDataClass.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "Weather+CoreDataClass.m"; sourceTree = "<group>"; };
+		CEB6D20325B6F1AC00486081 /* Weather+CoreDataProperties.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "Weather+CoreDataProperties.m"; sourceTree = "<group>"; };
+		CEB6D20925B6F2A100486081 /* MainViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MainViewController.h; sourceTree = "<group>"; };
+		CEB6D20A25B6F2A100486081 /* MainViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MainViewController.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -63,6 +72,7 @@
 		CE910BF025B6EBA800FF40DB /* WeatherInBrisbane */ = {
 			isa = PBXGroup;
 			children = (
+				CEB6D20725B6F1B100486081 /* CoreData */,
 				CE910BF125B6EBA800FF40DB /* AppDelegate.h */,
 				CE910BF225B6EBA800FF40DB /* AppDelegate.m */,
 				CE910BF425B6EBA800FF40DB /* SceneDelegate.h */,
@@ -70,13 +80,26 @@
 				CE910BF725B6EBA800FF40DB /* ViewController.h */,
 				CE910BF825B6EBA800FF40DB /* ViewController.m */,
 				CE910BFA25B6EBA800FF40DB /* Main.storyboard */,
+				CEB6D20925B6F2A100486081 /* MainViewController.h */,
+				CEB6D20A25B6F2A100486081 /* MainViewController.m */,
 				CE910C0025B6EBA900FF40DB /* Assets.xcassets */,
 				CE910C0225B6EBA900FF40DB /* LaunchScreen.storyboard */,
 				CE910C0525B6EBA900FF40DB /* Info.plist */,
 				CE910C0625B6EBA900FF40DB /* main.m */,
-				CE910BFD25B6EBA800FF40DB /* WeatherInBrisbane.xcdatamodeld */,
 			);
 			path = WeatherInBrisbane;
+			sourceTree = "<group>";
+		};
+		CEB6D20725B6F1B100486081 /* CoreData */ = {
+			isa = PBXGroup;
+			children = (
+				CEB6D20025B6F1AC00486081 /* Weather+CoreDataProperties.h */,
+				CEB6D20125B6F1AC00486081 /* Weather+CoreDataClass.h */,
+				CEB6D20225B6F1AC00486081 /* Weather+CoreDataClass.m */,
+				CEB6D20325B6F1AC00486081 /* Weather+CoreDataProperties.m */,
+				CE910BFD25B6EBA800FF40DB /* WeatherInBrisbane.xcdatamodeld */,
+			);
+			path = CoreData;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -150,9 +173,12 @@
 			files = (
 				CE910C0725B6EBA900FF40DB /* main.m in Sources */,
 				CE910BF925B6EBA800FF40DB /* ViewController.m in Sources */,
+				CEB6D20425B6F1AC00486081 /* Weather+CoreDataClass.m in Sources */,
+				CEB6D20B25B6F2A100486081 /* MainViewController.m in Sources */,
 				CE910BF325B6EBA800FF40DB /* AppDelegate.m in Sources */,
 				CE910BF625B6EBA800FF40DB /* SceneDelegate.m in Sources */,
 				CE910BFF25B6EBA800FF40DB /* WeatherInBrisbane.xcdatamodeld in Sources */,
+				CEB6D20525B6F1AC00486081 /* Weather+CoreDataProperties.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -303,7 +329,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.kitti.WeatherInBrisbane;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Debug;
 		};
@@ -320,7 +346,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.kitti.WeatherInBrisbane;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Release;
 		};
