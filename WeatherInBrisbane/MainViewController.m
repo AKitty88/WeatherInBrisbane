@@ -6,6 +6,8 @@
 //
 
 #import "MainViewController.h"
+#import "Appdelegate.h"
+#import <CoreData/CoreData.h>
 
 @interface MainViewController ()
 
@@ -33,7 +35,26 @@
 }
 
 - (void)saveWeatherData:(NSData *)weatherData {
+    AppDelegate *delegate = (AppDelegate *)[UIApplication sharedApplication].delegate;
+    NSManagedObjectContext *context = delegate.persistentContainer.viewContext;
+    NSManagedObject *newWeatherEntry = [NSEntityDescription insertNewObjectForEntityForName:@"Weather" inManagedObjectContext:context];
     
+    NSArray *jsonObject = [NSJSONSerialization JSONObjectWithData:weatherData options:0 error:nil];
+    
+    NSDictionary *attributes = [[newWeatherEntry entity] attributesByName];         // save all data
+    for (NSString *attribute in attributes) {
+        id value = [jsonObject[0] objectForKey:attribute];
+        if (value == nil) {
+            continue;
+        }
+        [newWeatherEntry setValue:value forKey:attribute];
+    }
+    
+    NSError *error = nil;
+    
+    if (![context save:&error]) {
+        NSLog([error localizedDescription]);
+    }
 }
 
 - (IBAction)showWeather:(UIButton *)sender {
@@ -46,8 +67,10 @@
     NSURLSession *session = [NSURLSession sessionWithConfiguration:[NSURLSessionConfiguration defaultSessionConfiguration]];
     [[session dataTaskWithRequest:request completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
         NSString *requestReply = [[NSString alloc] initWithData:data encoding:NSASCIIStringEncoding];
-        NSLog(@"Request reply: %@", requestReply);
-        [self saveWeatherData: data];
+        
+        if (data != nil) {
+            [self saveWeatherData: data];
+        }
     }] resume];
 }
 

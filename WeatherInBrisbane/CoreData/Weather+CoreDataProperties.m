@@ -2,7 +2,7 @@
 //  Weather+CoreDataProperties.m
 //  WeatherInBrisbane
 //
-//  Created by User on 19/1/21.
+//  Created by User on 21/1/21.
 //
 //
 
