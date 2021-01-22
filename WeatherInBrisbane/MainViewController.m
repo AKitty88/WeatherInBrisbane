@@ -17,6 +17,34 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+    _weatherData = [[NSMutableArray<NSManagedObject*> alloc] init];
+    _weatherAttributes = [[NSMutableArray alloc] init];
+    AppDelegate *delegate = (AppDelegate *)[UIApplication sharedApplication].delegate;
+    _managedContext = delegate.persistentContainer.viewContext;
+    
+    [self getWeatherFromDataBase];
+    [self emptyWeatherCoreData];
+}
+
+- (void)getWeatherFromDataBase {
+    NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] initWithEntityName: @"Weather"];
+    NSMutableArray *weatherFromDB = [[NSMutableArray<NSManagedObject*> alloc] init];
+    weatherFromDB = [[_managedContext executeFetchRequest:fetchRequest error: nil] mutableCopy];
+    if (weatherFromDB.count > 0) {
+        _weatherData = [weatherFromDB mutableCopy];
+        // assuming the number of attributes doesn't change within a day. If I had more time I could test if this is always true
+        _weatherAttributes = [[[[weatherFromDB[0] entity] attributesByName] allKeys] mutableCopy];
+        NSLog(@"--------  weatherData: %@", weatherFromDB);
+    }
+}
+
+- (void) emptyWeatherCoreData {
+    AppDelegate *delegate = (AppDelegate *)[UIApplication sharedApplication].delegate;
+    NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] initWithEntityName: @"Weather"];
+    NSBatchDeleteRequest *delete = [[NSBatchDeleteRequest alloc] initWithFetchRequest:fetchRequest];
+
+    NSError *deleteError = nil;
+    [delegate.persistentContainer.persistentStoreCoordinator executeRequest:delete withContext:_managedContext error:&deleteError];
 }
 
 - (NSString*)getYesterdaysDateAsString {
@@ -35,15 +63,12 @@
 }
 
 - (void)saveWeatherData:(NSData *)weatherData {
-    AppDelegate *delegate = (AppDelegate *)[UIApplication sharedApplication].delegate;
-    NSManagedObjectContext *context = delegate.persistentContainer.viewContext;
-    NSManagedObject *newWeatherEntry = [NSEntityDescription insertNewObjectForEntityForName:@"Weather" inManagedObjectContext:context];
-    
-    NSArray *jsonObject = [NSJSONSerialization JSONObjectWithData:weatherData options:0 error:nil];
+    NSManagedObject *newWeatherEntry = [NSEntityDescription insertNewObjectForEntityForName:@"Weather" inManagedObjectContext:_managedContext];
+    NSArray *jsonArray = [NSJSONSerialization JSONObjectWithData:weatherData options:0 error:nil];
     
     NSDictionary *attributes = [[newWeatherEntry entity] attributesByName];         // save all data
     for (NSString *attribute in attributes) {
-        id value = [jsonObject[0] objectForKey:attribute];
+        id value = [jsonArray[0] objectForKey:attribute];
         if (value == nil) {
             continue;
         }
@@ -52,7 +77,7 @@
     
     NSError *error = nil;
     
-    if (![context save:&error]) {
+    if (![_managedContext save:&error]) {
         NSLog([error localizedDescription]);
     }
 }
@@ -70,8 +95,29 @@
         
         if (data != nil) {
             [self saveWeatherData: data];
+            NSMutableArray *weatherArray = [[NSMutableArray alloc] init];
+            
+            for (NSManagedObject *weather in _weatherData) {
+                [weatherArray addObject: [weather dictionaryWithValuesForKeys:_weatherAttributes]];
+            }
+            
+            [self.delegate newWeatherDataReceived: weatherArray];
         }
     }] resume];
+}
+
+- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
+    WeatherTableViewController *vc = [segue destinationViewController];
+    _delegate = vc;
+    vc.weatherData = [[NSMutableArray alloc] init];
+    NSMutableArray *weatherArray = [[NSMutableArray alloc] init];
+    
+    for (NSManagedObject *weather in _weatherData) {
+        [weatherArray addObject: [weather dictionaryWithValuesForKeys:_weatherAttributes]];
+    }
+    vc.weatherData = [weatherArray mutableCopy];
+    vc.weatherAttributes = [[NSMutableArray alloc] init];
+    vc.weatherAttributes = _weatherAttributes;
 }
 
 @end
