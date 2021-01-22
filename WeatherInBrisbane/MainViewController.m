@@ -23,7 +23,7 @@
     _managedContext = delegate.persistentContainer.viewContext;
     
     [self getWeatherFromDataBase];
-    [self emptyWeatherCoreData];
+    [self emptyWeatherInDataBase];
 }
 
 - (void)getWeatherFromDataBase {
@@ -38,7 +38,7 @@
     }
 }
 
-- (void) emptyWeatherCoreData {
+- (void) emptyWeatherInDataBase {
     AppDelegate *delegate = (AppDelegate *)[UIApplication sharedApplication].delegate;
     NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] initWithEntityName: @"Weather"];
     NSBatchDeleteRequest *delete = [[NSBatchDeleteRequest alloc] initWithFetchRequest:fetchRequest];
@@ -63,16 +63,23 @@
 }
 
 - (void)saveWeatherData:(NSData *)weatherData {
+    _weatherData = [[NSMutableArray<NSManagedObject*> alloc] init];
     NSManagedObject *newWeatherEntry = [NSEntityDescription insertNewObjectForEntityForName:@"Weather" inManagedObjectContext:_managedContext];
     NSArray *jsonArray = [NSJSONSerialization JSONObjectWithData:weatherData options:0 error:nil];
+    NSDictionary *attributes = [[newWeatherEntry entity] attributesByName];
     
-    NSDictionary *attributes = [[newWeatherEntry entity] attributesByName];         // save all data
-    for (NSString *attribute in attributes) {
-        id value = [jsonArray[0] objectForKey:attribute];
-        if (value == nil) {
-            continue;
+    for (NSDictionary *weather in jsonArray) {
+        for (NSString *attribute in attributes) {
+            id value = [weather objectForKey:attribute];
+            if (value == nil || [value isEqual:[NSNull null]])
+            {
+                continue;
+            }
+            else {
+                [newWeatherEntry setValue:value forKey:attribute];
+            }
         }
-        [newWeatherEntry setValue:value forKey:attribute];
+        [_weatherData addObject:newWeatherEntry];
     }
     
     NSError *error = nil;
@@ -83,7 +90,7 @@
 }
 
 - (IBAction)showWeather:(UIButton *)sender {
-    NSMutableURLRequest *request = [[NSMutableURLRequest alloc] init];
+    NSMutableURLRequest *request = [[NSMutableURLRequest alloc] init] ;
     
     NSString* urlString = [NSString stringWithFormat: @"https://www.metaweather.com/api/location/1100661/%@", [self getYesterdaysDateAsString]];
     [request setURL:[NSURL URLWithString:urlString]];

@@ -12,9 +12,9 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     self.clearsSelectionOnViewWillAppear = NO;
-    _keysInWeatherData = [[NSMutableArray alloc] init];
+    _weatherDataKeys = [[NSMutableArray alloc] init];
     if (_weatherData.count > 0) {
-        _keysInWeatherData = [_weatherData[0] allKeys];
+        _weatherDataKeys = [_weatherData[0] allKeys];
     }
 }
 
@@ -22,7 +22,7 @@
     _weatherData = weatherData;
     // assuming the number of attributes doesn't change within a day. If I had more time I could test if this is always true
     if (_weatherData.count > 0) {
-        _keysInWeatherData = [_weatherData[0] allKeys];
+        _weatherDataKeys = [_weatherData[0] allKeys];
     }
     dispatch_async(dispatch_get_main_queue(), ^{
             [self.tableView reloadData];
@@ -36,14 +36,14 @@
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-    return _keysInWeatherData.count;
+    return _weatherDataKeys.count;
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"weatherCell" forIndexPath:indexPath];
-    cell.textLabel.text = _keysInWeatherData[indexPath.row];
+    cell.textLabel.text = _weatherDataKeys[indexPath.row];
     NSDictionary *weather = _weatherData[indexPath.section];
-    NSString *keyString = [NSString stringWithFormat: @"%@", (_keysInWeatherData[indexPath.row])];
+    NSString *keyString = [NSString stringWithFormat: @"%@", (_weatherDataKeys[indexPath.row])];
     cell.detailTextLabel.text = [NSString stringWithFormat: @"%@", [weather valueForKey: keyString]];
     
     if ([keyString isEqualToString:@"created"]) {
