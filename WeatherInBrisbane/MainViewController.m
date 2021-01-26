@@ -24,7 +24,21 @@
     _managedContext = delegate.persistentContainer.viewContext;
     
     [self getWeatherFromDataBase];
-    [self emptyWeatherInDataBase];
+    
+    if ([self connectedToInternet] == YES) {
+        [self emptyWeatherInDataBase];
+    }
+}
+
+- (Boolean)connectedToInternet {
+    NSURL *scriptUrl = [NSURL URLWithString:@"https://www.metaweather.com/api/location/1100661"];
+    NSData *data = [NSData dataWithContentsOfURL:scriptUrl];
+    if (data) {
+        return YES;
+    }
+    else {
+        return NO;
+    }
 }
 
 - (void)getWeatherFromDataBase {
@@ -35,6 +49,8 @@
         _weatherData = [weatherFromDB mutableCopy];
         // assuming the number of attributes doesn't change within a day. If I had more time I could test if this is always true
         _weatherAttributes = [[[[weatherFromDB[0] entity] attributesByName] allKeys] mutableCopy];
+        NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+        [userDefaults setObject:_weatherAttributes forKey:@"weatherAttributes"];
     }
 }
 
@@ -72,7 +88,7 @@
     
     
     for (NSDictionary *weather in jsonArray) {
-        newWeatherEntry = [NSEntityDescription insertNewObjectForEntityForName:@"Weather" inManagedObjectContext:_managedContext];
+        NSManagedObject *newWeatherEntry = [NSEntityDescription insertNewObjectForEntityForName:@"Weather" inManagedObjectContext:_managedContext];
         
         for (NSString *attribute in attributes) {
             id value = [weather objectForKey:attribute];
@@ -94,7 +110,7 @@
         if (_managedContext != nil) {
             [_managedContext performBlockAndWait:^{
                 NSError *error = nil;
-                if ([_managedContext hasChanges] && ![_managedContext save:&error]) {
+                if (![_managedContext save:&error]) {
                     NSLog(@"Unresolved error %@, %@", error, [error userInfo]);
                 }
             }];
@@ -136,7 +152,19 @@
     }
     vc.weatherData = [weatherArray mutableCopy];
     vc.weatherAttributesOrdered = [[NSMutableArray alloc] init];
-    vc.weatherAttributesOrdered = [_weatherAttributesOrdered mutableCopy];
+    
+    if (_weatherAttributesOrdered.count > 0) {
+        vc.weatherAttributesOrdered = [_weatherAttributesOrdered mutableCopy];
+    }
+    else {
+        NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+        NSArray *attributesfromUserDefaults = [userDefaults objectForKey:@"weatherAttributes"];
+        
+        if (attributesfromUserDefaults == nil) {
+            attributesfromUserDefaults =  [[NSMutableArray alloc] init];
+        }
+        vc.weatherAttributesOrdered = [attributesfromUserDefaults mutableCopy];
+    }
 }
 
 @end
