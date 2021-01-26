@@ -40,8 +40,8 @@
     NSString *keyString = [NSString stringWithFormat: @"%@", (_weatherAttributesOrdered[indexPath.row])];
     cell.detailTextLabel.text = [NSString stringWithFormat: @"%@", [weather valueForKey: keyString]];
     
-    if ([keyString isEqualToString:@"created"]) {
-        cell.contentView.backgroundColor = [UIColor grayColor];
+    if ([keyString isEqualToString:_weatherAttributesOrdered[0]]) {
+        cell.contentView.backgroundColor = [UIColor lightGrayColor];
     }
     else {
         cell.contentView.backgroundColor = [UIColor whiteColor];
