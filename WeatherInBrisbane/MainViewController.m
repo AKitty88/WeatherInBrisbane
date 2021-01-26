@@ -17,8 +17,9 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    _weatherData = [[NSMutableArray<NSManagedObject*> alloc] init];
+    _weatherData = [[NSMutableArray alloc] init];
     _weatherAttributes = [[NSMutableArray alloc] init];
+    _weatherAttributesOrdered = [[NSMutableArray alloc] init];
     AppDelegate *delegate = (AppDelegate *)[UIApplication sharedApplication].delegate;
     _managedContext = delegate.persistentContainer.viewContext;
     
@@ -28,13 +29,12 @@
 
 - (void)getWeatherFromDataBase {
     NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] initWithEntityName: @"Weather"];
-    NSMutableArray *weatherFromDB = [[NSMutableArray<NSManagedObject*> alloc] init];
+    NSMutableArray *weatherFromDB = [[NSMutableArray alloc] init];
     weatherFromDB = [[_managedContext executeFetchRequest:fetchRequest error: nil] mutableCopy];
     if (weatherFromDB.count > 0) {
         _weatherData = [weatherFromDB mutableCopy];
         // assuming the number of attributes doesn't change within a day. If I had more time I could test if this is always true
         _weatherAttributes = [[[[weatherFromDB[0] entity] attributesByName] allKeys] mutableCopy];
-        NSLog(@"--------  weatherData: %@", weatherFromDB);
     }
 }
 
@@ -63,29 +63,42 @@
 }
 
 - (void)saveWeatherData:(NSData *)weatherData {
-    _weatherData = [[NSMutableArray<NSManagedObject*> alloc] init];
     NSManagedObject *newWeatherEntry = [NSEntityDescription insertNewObjectForEntityForName:@"Weather" inManagedObjectContext:_managedContext];
     NSArray *jsonArray = [NSJSONSerialization JSONObjectWithData:weatherData options:0 error:nil];
     NSDictionary *attributes = [[newWeatherEntry entity] attributesByName];
+    // assuming the number of attributes doesn't change within a day. If I had more time I could test if this is always true
+    _weatherData = nil;
+    _weatherData = [[NSMutableArray alloc] init];
+    
     
     for (NSDictionary *weather in jsonArray) {
+        newWeatherEntry = [NSEntityDescription insertNewObjectForEntityForName:@"Weather" inManagedObjectContext:_managedContext];
+        
         for (NSString *attribute in attributes) {
             id value = [weather objectForKey:attribute];
-            if (value == nil || [value isEqual:[NSNull null]])
-            {
+            
+            if (value == nil || [value isEqual:[NSNull null]]) {
                 continue;
             }
             else {
                 [newWeatherEntry setValue:value forKey:attribute];
+                
+                if (![_weatherAttributesOrdered containsObject:attribute] && _weatherAttributesOrdered.count < attributes.count) {
+                    [_weatherAttributesOrdered addObject:attribute];
+                }
             }
         }
         [_weatherData addObject:newWeatherEntry];
-    }
-    
-    NSError *error = nil;
-    
-    if (![_managedContext save:&error]) {
-        NSLog([error localizedDescription]);
+        _weatherAttributes = [_weatherAttributesOrdered mutableCopy];
+        
+        if (_managedContext != nil) {
+            [_managedContext performBlockAndWait:^{
+                NSError *error = nil;
+                if ([_managedContext hasChanges] && ![_managedContext save:&error]) {
+                    NSLog(@"Unresolved error %@, %@", error, [error userInfo]);
+                }
+            }];
+        }
     }
 }
 
@@ -107,8 +120,7 @@
             for (NSManagedObject *weather in _weatherData) {
                 [weatherArray addObject: [weather dictionaryWithValuesForKeys:_weatherAttributes]];
             }
-            
-            [self.delegate newWeatherDataReceived: weatherArray];
+            [self.delegate newWeatherDataReceived: weatherArray with:self.weatherAttributesOrdered];
         }
     }] resume];
 }
@@ -123,8 +135,8 @@
         [weatherArray addObject: [weather dictionaryWithValuesForKeys:_weatherAttributes]];
     }
     vc.weatherData = [weatherArray mutableCopy];
-    vc.weatherAttributes = [[NSMutableArray alloc] init];
-    vc.weatherAttributes = _weatherAttributes;
+    vc.weatherAttributesOrdered = [[NSMutableArray alloc] init];
+    vc.weatherAttributesOrdered = [_weatherAttributesOrdered mutableCopy];
 }
 
 @end

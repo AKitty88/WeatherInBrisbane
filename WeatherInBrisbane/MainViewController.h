@@ -12,10 +12,11 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface MainViewController : UIViewController
 
-@property (nonatomic, strong) NSMutableArray *weatherData;
-@property (nonatomic, strong) NSManagedObjectContext *managedContext;
-@property (nonatomic, strong) NSMutableArray *weatherAttributes;
-@property (nonatomic, strong) WeatherTableViewController *delegate;
+@property (atomic, strong) NSMutableArray *weatherData;
+@property (atomic, strong) NSManagedObjectContext *managedContext;
+@property (atomic, strong) NSMutableArray *weatherAttributes;
+@property (atomic, strong) WeatherTableViewController *delegate;
+@property (atomic, strong) NSMutableArray *weatherAttributesOrdered;
 
 @end
 

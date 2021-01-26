@@ -11,9 +11,8 @@
 @interface WeatherTableViewController : UITableViewController
 
 @property (atomic, strong) NSMutableArray *weatherData;
-@property (atomic, strong) NSMutableArray *weatherAttributes;
-@property (atomic, strong) NSMutableArray *weatherDataKeys;
+@property (atomic, strong) NSMutableArray *weatherAttributesOrdered;
 
-- (void)newWeatherDataReceived:(NSManagedObject *)weatherData;
+- (void)newWeatherDataReceived:(NSMutableArray *)weatherData with:(NSMutableArray*)weatherAttributesOrdered;
 
 @end
