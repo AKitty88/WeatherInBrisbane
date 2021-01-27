@@ -6,12 +6,19 @@
 //
 
 #import "WeatherTableViewController.h"
+#import <SwiftMessages/SwiftMessages-Swift.h>
+#import "WeatherInBrisbane-Swift.h"
 
 @implementation WeatherTableViewController
 
 - (void)viewDidLoad {
     [super viewDidLoad];
     self.clearsSelectionOnViewWillAppear = NO;
+    
+    if (_weatherData.count > 0) {
+        Message *message = [[Message alloc] init];
+        [message showSuccessMessageWithText: @"Yesterday's weather information loaded from memory"];
+    }
 }
 
 - (void)newWeatherDataReceived:(NSMutableArray *)weatherData with:(NSMutableArray*)weatherAttributesOrdered {
@@ -20,6 +27,8 @@
     
     dispatch_async(dispatch_get_main_queue(), ^{
         [self.tableView reloadData];
+        Message *message = [[Message alloc] init];
+        [message showSuccessMessageWithText: @"Yesterday's weather information loaded using network"];
     });
 }
 

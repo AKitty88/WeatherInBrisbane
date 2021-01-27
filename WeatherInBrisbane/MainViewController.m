@@ -9,6 +9,7 @@
 #import "Appdelegate.h"
 #import <CoreData/CoreData.h>
 #import <SwiftMessages/SwiftMessages-Swift.h>
+#import "WeatherInBrisbane-Swift.h"
 
 @interface MainViewController ()
 
@@ -62,6 +63,11 @@
 
     NSError *deleteError = nil;
     [delegate.persistentContainer.persistentStoreCoordinator executeRequest:delete withContext:_managedContext error:&deleteError];
+    
+    if (deleteError != nil) {
+        Message *message = [[Message alloc] init];
+        [message showErrorMessageWithText: deleteError.localizedDescription];
+    }
 }
 
 - (NSString*)getYesterdaysDateAsString {
@@ -112,7 +118,8 @@
             [_managedContext performBlockAndWait:^{
                 NSError *error = nil;
                 if (![_managedContext save:&error]) {
-                    NSLog(@"Unresolved error %@, %@", error, [error userInfo]);
+                    Message *message = [[Message alloc] init];
+                    [message showErrorMessageWithText: error.localizedDescription];
                 }
             }];
         }
@@ -121,7 +128,7 @@
 
 - (IBAction)showWeather:(UIButton *)sender {
     NSMutableURLRequest *request = [[NSMutableURLRequest alloc] init] ;
-    
+
     NSString* urlString = [NSString stringWithFormat: @"https://www.metaweather.com/api/location/1100661/%@", [self getYesterdaysDateAsString]];
     [request setURL:[NSURL URLWithString:urlString]];
     [request setHTTPMethod:@"GET"];
@@ -129,11 +136,11 @@
     NSURLSession *session = [NSURLSession sessionWithConfiguration:[NSURLSessionConfiguration defaultSessionConfiguration]];
     [[session dataTaskWithRequest:request completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
         NSString *requestReply = [[NSString alloc] initWithData:data encoding:NSASCIIStringEncoding];
-        
+
         if (data != nil) {
             [self saveWeatherData: data];
             NSMutableArray *weatherArray = [[NSMutableArray alloc] init];
-            
+
             for (NSManagedObject *weather in _weatherData) {
                 [weatherArray addObject: [weather dictionaryWithValuesForKeys:_weatherAttributes]];
             }
