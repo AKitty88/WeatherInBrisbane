@@ -1,0 +1,18 @@
+PODS:
+  - SwiftMessages (9.0.0):
+    - SwiftMessages/App (= 9.0.0)
+  - SwiftMessages/App (9.0.0)
+
+DEPENDENCIES:
+  - SwiftMessages
+
+SPEC REPOS:
+  trunk:
+    - SwiftMessages
+
+SPEC CHECKSUMS:
+  SwiftMessages: 55274ca3a239062398603008ed81924cfd1fe798
+
+PODFILE CHECKSUM: ca73abf082de6062ff72174c86f18dab4fcfa0fc
+
+COCOAPODS: 1.10.1
